@@ -47,6 +47,18 @@ app.get('/feed',async(req,res)=>{
         res.status(400).send('error occured',err.message)
     }
 })
+app.patch('/user',async(req,res)=>{
+    try{
+        const userId=req.body.userId;
+        const data=req.body;
+        await User.findByIdAndUpdate({_id:userId},data,{runValidators:true})
+        res.send('user details updated successfully');
+        
+    }
+    catch(err){
+        res.send('something went wrong',err.message)
+    }
+})
 
 
 connectDB().then(()=>{
