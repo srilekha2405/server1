@@ -13,7 +13,7 @@ app.post('/signup',async(req,res)=>{
     res.send('user added successfully')
     }
     catch(err){
-        res.status(400).send('error occured',err.message)
+        res.status(400).send('error occured'+err.message)
     }
 });
 

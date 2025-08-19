@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+const validator=require('validator');
 
 const userSchema=new mongoose.Schema({
     firstName:{
@@ -15,11 +16,21 @@ const userSchema=new mongoose.Schema({
         lowercase:true,
         required:true,
         unique:true,
-        trim:true
+        trim:true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                 throw new Error('Invalid EmailId')
+            }
+        }
     },
     password:{
         type:String,
         required:true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                 throw new Error('Enter a Strong Password')
+            }
+        }
     },
     age:{
         type:Number,
@@ -35,14 +46,26 @@ const userSchema=new mongoose.Schema({
     },
     photoUrl:{
         type:String,
-        default:"https://i.pinimg.com/originals/01/4e/f2/014ef2f860e8e56b27d4a3267e0a193a.jpg"
-    },
+        default:"https://i.pinimg.com/originals/01/4e/f2/014ef2f860e8e56b27d4a3267e0a193a.jpg",
+        validate(value){
+            if(!validator.isURL(value)){
+                 throw new Error('Enter a validURL')
+            }
+        }
+        
+    }, 
     about:{
         type:String,
         default:"This is a default about of the user!",
     },
     skills:{
         type:[String],
+        validate:{
+            validator(value){
+                return Array.isArray(value) && new Set(value).size===value.length;
+            },
+            message:"Duplicate skills are not allowed"
+        }
     }
 },
 {
