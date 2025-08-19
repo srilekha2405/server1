@@ -47,16 +47,34 @@ app.get('/feed',async(req,res)=>{
         res.status(400).send('error occured',err.message)
     }
 })
-app.patch('/user',async(req,res)=>{
+app.patch('/user/:userId',async(req,res)=>{
+    const userId=req.params?.userId;
+    const data=req.body;
     try{
-        const userId=req.body.userId;
-        const data=req.body;
-        await User.findByIdAndUpdate({_id:userId},data,{runValidators:true})
+        const ALLOWED_UPDATES=[
+            "userId",
+            "photoUrl",
+            "about",
+            "gender",
+            "age",
+            "skills"
+        ];
+        const isUpdateAllowed=Object.keys(data).every((k)=>
+        ALLOWED_UPDATES.includes(k));
+        console.log(isUpdateAllowed) 
+        if(!isUpdateAllowed){
+            throw new Error('Update not allowed')
+        }
+        if(data?.skills.length>10){
+            throw new Error('skills cannot be exceeded more than 10')
+        }
+        
+        await User.findByIdAndUpdate({_id:userId},data,{runValidators:true,returnDocument:"after"})
         res.send('user details updated successfully');
         
     }
     catch(err){
-        res.send('something went wrong',err.message)
+        res.send('something went wrong-'+err.message)
     }
 })
 
