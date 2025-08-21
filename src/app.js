@@ -3,7 +3,6 @@ const connectDB=require('./config/dataBase')
 const app=express();
 const User=require('./models/user')
 const bcrypt = require('bcrypt');
-
 const { validationSignup}=require('./utils/validation')
 
 app.use(express.json());
@@ -26,6 +25,27 @@ app.post('/signup',async(req,res)=>{
         res.status(400).send('Error:'+err.message)
     }
 });
+
+app.post('/login',async(req,res)=>{
+    try{
+    const {emailId,password}=req.body;
+    const user=await User.findOne({emailId:emailId});
+    if(!user){
+        throw new Error('Invalid credentials')
+    }
+    const isPasswordValid=await bcrypt.compare(password,user.password);
+    if(!isPasswordValid){
+        throw new Error('Invalid credentials')
+    }
+    else{
+        res.send('login successful')
+    }
+    }
+    catch(err){
+        res.status(400).send('Error:'+err.message)
+    }
+
+})
 
 app.get('/user',async(req,res)=>{
     try{
