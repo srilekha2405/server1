@@ -1,4 +1,5 @@
 const validator = require('validator');
+
 const validationSignup=(req)=>{
     const {firstName,lastName,emailId,password}=req.body;
     if(!firstName||!lastName){
@@ -11,6 +12,22 @@ const validationSignup=(req)=>{
         throw new Error('Enter a strong password')
     }
 }
+
+const validateEditProfile=(req)=>{
+    const allowedFields=[
+        "firstName",
+         "lastName",
+         "emailId",
+         "photoUrl",
+         "gender",
+         "age",
+         "about",
+         "skills"
+    ]
+    const isValidUpdate=Object.keys(req.body).every((field)=>allowedFields.includes(field));
+    return isValidUpdate;
+}
 module.exports={
-    validationSignup
+    validationSignup,
+    validateEditProfile
 }
