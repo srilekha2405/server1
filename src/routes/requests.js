@@ -19,7 +19,7 @@ requestRoute.post('/request/send/:status/:toUserId',
 
         const toUser= await User.findById(toUserId)
         if(!toUser){
-            return res.status(400).json({message:'User not find'})
+            return res.status(400).json({message:'User not found'})
         }
 
         const existingConnectionRequest= await ConnectionRequest.findOne({
@@ -46,6 +46,31 @@ requestRoute.post('/request/send/:status/:toUserId',
         catch(err){
             res.status(400).send('Error' +err.message)
         }
+    }
+)
+
+requestRoute.post('/request/review/:status/:requestId',
+    userAuth,
+    async(req,res)=>{ 
+        const loggedInUser=req.user;
+        const {requestId,status}=req.params;
+        const allowedStatus=["accepted","rejected"];
+        if(!allowedStatus.includes(status)){
+            return res.status(400).json({message :"status not allowed"})
+        }
+        const connectionRequest= await ConnectionRequest.findOne({
+            _id:requestId,
+            toUserId:loggedInUser._id,
+            status:"intrested",
+        })
+        if(!connectionRequest){
+            res.status(400).json({message:"connection request not found"})
+        }
+        connectionRequest.status=status;
+        const data=await connectionRequest.save();
+        res.json({message:"connection request gets accepted",
+            data
+        })
     }
 )
 module.exports=requestRoute;
