@@ -51,7 +51,8 @@ requestRoute.post('/request/send/:status/:toUserId',
 
 requestRoute.post('/request/review/:status/:requestId',
     userAuth,
-    async(req,res)=>{ 
+    async(req,res)=>{
+        try{
         const loggedInUser=req.user;
         const {requestId,status}=req.params;
         const allowedStatus=["accepted","rejected"];
@@ -68,9 +69,13 @@ requestRoute.post('/request/review/:status/:requestId',
         }
         connectionRequest.status=status;
         const data=await connectionRequest.save();
-        res.json({message:"connection request gets accepted",
+        res.json({message:" connection request gets accepted",
             data
         })
     }
+    catch(err){
+        res.status(400).send('Error'+err.message)
+    }
+}
 )
 module.exports=requestRoute;
