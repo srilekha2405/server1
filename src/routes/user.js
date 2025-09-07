@@ -51,4 +51,37 @@ userRoute.get('/user/connections',userAuth,async(req,res)=>{
     }
 })
 
+userRoute.get('/feed', userAuth, async(req,res)=>{
+    try{
+        const loggedInUser=req.user;
+        const page=parseInt(req.query.page) || 1;
+        let limit=parseInt(req.query.limit) || 10;
+        limit=limit>50? 50:limit;
+        const skip=(page-1)*limit;
+        const connectionRequests=await ConnectionRequest.find({
+            $or:[{fromUserId:loggedInUser._id},
+                {toUserId:loggedInUser._id}
+        ]})
+        const hiddenConnectionRequests=new Set();
+        connectionRequests.forEach((req)=>{
+            hiddenConnectionRequests.add(req.fromUserId.toString());
+            hiddenConnectionRequests.add(req.toUserId.toString())
+        })
+        const hiddenUsers=[...hiddenConnectionRequests]
+       const avaliableUsers=await User.find({
+        $and:[
+           {_id: { $nin: hiddenUsers }},
+           {_id:{$ne:loggedInUser._id}}
+        ]
+       }).select(USER_SAFE_DATA)
+         .skip(skip)
+         .limit(limit)
+       res.json({data:avaliableUsers});
+    }
+    catch(err){
+        res.status(400).send({message:err.message})
+    }
+    
+})
+
 module.exports=userRoute;
