@@ -4,10 +4,12 @@ const app=express();
 const User=require('./models/user')
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser')
-const jwt=require('jsonwebtoken')
+const jwt=require('jsonwebtoken');
+const cors=require('cors');
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 const authRouter=require('./routes/auth');
 const profileRouter=require('./routes/profile')
