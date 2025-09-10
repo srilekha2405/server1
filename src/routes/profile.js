@@ -4,7 +4,7 @@ const {userAuth}=require('../middlewares/auth')
 const {validateEditProfile}=require('../utils/validation')
 const bcrypt=require('bcrypt')
 
-profileAuth.get('/profile',userAuth,async(req,res)=>{
+profileAuth.get('/profile/view',userAuth,async(req,res)=>{
     try{
         const user=req.user;
         res.send(user)
