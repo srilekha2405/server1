@@ -1,8 +1,11 @@
+
 const express=require('express');
 const profileAuth=express.Router();
 const {userAuth}=require('../middlewares/auth')
 const {validateEditProfile}=require('../utils/validation')
 const bcrypt=require('bcrypt')
+require('dotenv').config();
+
 
 profileAuth.get('/profile/view',userAuth,async(req,res)=>{
     try{
@@ -17,19 +20,19 @@ profileAuth.get('/profile/view',userAuth,async(req,res)=>{
 profileAuth.patch('/profile/edit',userAuth,async(req,res)=>{
     try{
         validateEditProfile(req);
-        if(!validateEditProfile){
+        if(!validateEditProfile(req)){
             throw new Error('Edit not allowed');
         }
         const loggedInUser=req.user;
         Object.keys(req.body).forEach((key)=>loggedInUser[key]=req.body[key]);
          await loggedInUser.save()
         res.json({
-            message:`${loggedInUser.firstName} loggedin successfuly`,
+            message:`${loggedInUser.firstName} 's details edited successfully`,
             data:loggedInUser
         })
     }
     catch(err){
-        res.status(400).send("Error :"+err.message)
+        res.status(400).json({error: err.message })
     }
 })
 

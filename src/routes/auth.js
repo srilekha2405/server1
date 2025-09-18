@@ -1,3 +1,4 @@
+
 const express=require('express');
 const authRouter=express.Router();
 const { validationSignup}=require('../utils/validation');
@@ -15,8 +16,10 @@ authRouter.post('/signup',async(req,res)=>{
         emailId,
         password:passwordHash
     })
-    await user.save();
-    res.send('user added successfully')
+    const savedUser=await user.save();
+    const token= await savedUser.getJWT();
+    res.cookie("token",token,{expires:new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)})
+    res.json({message:'User saved successfully',data:savedUser})
     }
     catch(err){
         res.status(400).send('Error:'+err.message)
